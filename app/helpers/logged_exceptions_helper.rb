@@ -32,9 +32,14 @@ module LoggedExceptionsHelper
   # Rescue textilize call if RedCloth is not available.
   def pretty_format(text)
     begin
-      textilize(text).html_safe
+     txt = textilize(text).html_safe
     rescue
-      simple_format(text).html_safe
+     txt = simple_format(text).html_safe
     end
+     # In Ruby 1.9.x, Encoding is defined, so we force our default encoding
+     # to work around this Ruby 1.9 error:
+     # Encoding::CompatibilityError in LoggedExceptions/show
+     # "incompatible character encodings: ASCII-8BIT and UTF-8"
+     defined?(Encoding) ? txt.encode(Encoding.default_internal.to_s, undef: :replace) : txt
   end
 end
